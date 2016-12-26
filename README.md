@@ -1,2 +1,2 @@
-# aws-emailer
-emailer ported to aws, using HTML, PHP, JavaScript, etc
+# aws-stuff
+playing with aws, trying to learn how stuff works
