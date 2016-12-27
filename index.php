@@ -10,15 +10,13 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-
-  <script src='https://code.jquery.com/jquery-3.1.0.min.js'></script>
-  <script src="js/awsEndpoint.js"></script>
+  <?php require 'vendor/autoload.php'; ?>
   <script src="js/focus.js"></script>
 </head>
 
 <body>
   <div class="container-fluid">
-    <form role="form" id="form" action="sendemail" method="POST" target="_blank">
+    <form role="form" id="form" action="php/submit.php" method="POST" target="_blank">
       <?php include 'php/parseConfig.php'; ?>
       <?php include 'php/retrieveLabels.php'; ?>
       <?php include 'php/printLabelsList.php'; ?>

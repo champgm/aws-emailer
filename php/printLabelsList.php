@@ -6,7 +6,7 @@ foreach($labels as $label){
 <div class=\"row\">
     <div class=\"col-xs-4 col-xs-offset-4\">
         <div class=\"radio\">
-            <label><input type=\"radio\" name=\"recipient\" value=\"{$label}\">{$label}</label>
+            <label><input type=\"radio\" name=\"label\" value=\"{$label}\">{$label}</label>
         </div>
     </div>
 </div>";
