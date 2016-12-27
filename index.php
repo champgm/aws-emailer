@@ -19,36 +19,10 @@
 <body>
   <div class="container-fluid">
     <form role="form" id="form" action="sendemail" method="POST" target="_blank">
-      <!--<div class="row">
-<div class="col-xs-4 col-xs-offset-4">
-<div class="radio">
-<label><input type="radio" name="recipient" value="mac" checked="checked">Mac</label>
-</div>
-</div>
-</div>
-<div class="row">
-<div class="col-xs-4 col-xs-offset-4">
-<div class="radio">
-<label><input type="radio" name="recipient" value="na">Na</label>
-</div>
-</div>
-</div>
-<div class="row">
-<div class="col-xs-4 col-xs-offset-4">
-<div class="radio">
-<label><input type="radio" name="recipient" value="all">All</label>
-</div>
-</div>
-</div>
-<div class="row">
-<div class="col-xs-4 col-xs-offset-4">
-<div class="radio">
-<label><input type="radio" name="recipient" value="error">Error</label>
-</div>
-</div>
-</div>-->
-      <?php include 'php/retrieveTags.php' ?>
-      <?php print "<div><p>stuff stuff stuff</p></div>"; ?>
+      <?php include 'php/parseConfig.php'; ?>
+      <?php include 'php/retrieveLabels.php'; ?>
+      <?php include 'php/printLabelsList.php'; ?>
+
         <div class="form-group">
           <label for="subject">Subject:</label>
           <input type="text" class="form-control" id="subject" name="subject">

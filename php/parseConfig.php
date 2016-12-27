@@ -9,5 +9,6 @@ $username = $_SERVER['RDS_USERNAME'];
 $password = $_SERVER['RDS_PASSWORD'];
 
 $dbh = new PDO($dsn, $username, $password);
+$dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
 ?>
