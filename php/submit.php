@@ -1,72 +1,73 @@
 <?php
 include 'uuid.php';
+use Aws\Sns\SnsClient;
+use Aws\DynamoDb\DynamoDbClient;
 
-function submit_sns()
+function div_print($message)
 {
+    print '<div>';
+    print_r($message);
+    print '</div>';
+}
 
-    $snsMessage = array(
-    'eventId' => $eventId,
-    'label' => $label,
-    'subjectId' => $subjectId,
-    'bodyId' => $bodyId
-    );
-  
-    $factory = SnsClient::factory(array('region' => 'us-west-2'));
-    $client = $factory->get('Sns');
-  
-  // $result = $client->createQueue(array('QueueName' => 'my-queue'));
-  // $queueUrl = $result->get('QueueUrl');
-  
-  // echo 'SQS queue url: $queueUrl';
-    $snsMessage = '{}';
+function submit_sns($eventId, $label, $subjectId, $bodyId)
+{
+    $client = SnsClient::factory(array('region' => 'us-west-2'));
+
+    $snsSubject = "Email Event with ID: $eventId";
     $snsArray = array(
-    'TopicArn' => 'arn:aws:sns:us-west-2:637769611129:emailer_entrypoint',
-    // 'TargetArn' => 'string',
-    // Message is required
-    'Message' => 'string',
-    'Subject' => 'string',
-    'MessageStructure' => 'string',
-    'MessageAttributes' => array(
-        // Associative array of custom 'String' key names
-        'String' => array(
-        // DataType is required
-        'DataType' => 'string',
-        'StringValue' => 'string',
-        'BinaryValue' => 'string',
-      ),
-      // ... repeated
-    ),
+      'eventId' => $eventId,
+      'label' => $label,
+      'subjectId' => $subjectId,
+      'bodyId' => $bodyId
+    );
+    $snsMessage = json_encode($snsArray);
+
+    $snsData = array(
+      'TopicArn' => 'arn:aws:sns:us-west-2:637769611129:emailer_entrypoint',
+      // 'TargetArn' => 'string',
+      // Message is required
+      'Message' => $snsMessage,
+      'Subject' => $snsSubject,
+      'MessageStructure' => 'json',
     );
   
   
-    $client->sendMessage(array(
-    'QueueUrl'    => $queueUrl,
-    'MessageBody' => 'Hello World!',
-    ));
-};
+    $result = $client->publish($snsData);
+    div_print($result);
+    return $result;
+}
 
-function store_message($eventId)
+function store_body($eventId, $body)
+{
+    $client = DynamoDbClient::factory(array('region' => 'us-west-2'));
+    $bodyId = UUID::v4();
+
+    $result = $client->putItem(array(
+      'TableName' => 'bodies',
+      'Item' => array(
+          'id'      => array('s' => $bodyId),
+          'eventId'    => array('s' => $time),
+          'body' => array('S' => $body)
+      )
+    ));
+
+    div_print($result);
+
+    return $bodyId;
+}
+
+function store_subject($eventId, $subject)
 {
     $insertStatement = $dbh->prepare("INSERT INTO subjects (id, eventId, subject) VALUES (?, ?, ?)");
 
     $subjectId = UUID::v4();
     $insertStatement->bindParam(1, $subjectId);
-    $insertStatement->bindParam(2, $value);
+    $insertStatement->bindParam(2, $eventId);
     $insertStatement->bindParam(3, $value);
-  
-  // insert one row
-    $name = 'one';
-    $value = 1;
     $insertStatement->execute();
 
-    return 
-}
-
-function store_subject()
-{
-    $statement = $dbh->prepare("INSERT INTO subjects (name, value) VALUES (:name, :value)");
-    $statement->bindParam(':name', $name);
-    $statement->bindParam(':value', $value);
+    return $subjectId;
 }
 
 
@@ -75,6 +76,7 @@ print '<div id=\'email_output\'>';
 if (!empty($_POST)) {
     if (isset($_POST['label'])) {
         if (isset($_POST['subject'])) {
+            $eventId = UUID::v4();
             print 'do stuff here';
             $label = $_POST['label'];
             $subject = $_POST['subject'];
@@ -85,6 +87,9 @@ if (!empty($_POST)) {
             } else {
                 $body = 'no text';
             }
+            $subjectId = store_subject($eventId, $subject);
+            $bodyId = store_body($eventId, $body);
+            submit_sns($eventId, $label, $subjectId, $bodyId)
         } else {
             print 'Cannot send email without subject.';
         };
