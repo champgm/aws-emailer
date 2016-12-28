@@ -11,13 +11,14 @@
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
   <?php require 'vendor/autoload.php'; ?>
+  <?php use Aws\Sns\SnsClient; ?>
   <script src="js/focus.js"></script>
 </head>
 
 <body>
   <div class="container-fluid">
     <form role="form" id="form" action="php/submit.php" method="POST" target="_blank">
-      <?php include 'php/parseConfig.php'; ?>
+      <?php include 'php/prepareDatabaseConnection.php'; ?>
       <?php include 'php/retrieveLabels.php'; ?>
       <?php include 'php/printLabelsList.php'; ?>
 
