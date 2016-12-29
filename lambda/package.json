@@ -1,0 +1,63 @@
+{
+  "name": "emailer",
+  "version": "1.0.0",
+  "description": "The lambda backend for a self-emailer",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf transpile",
+    "babel": "babel ./src -d ./transpile",
+    "lint": "node_modules/eslint/bin/eslint.js . --ext .js",
+    "jasmine": "node_modules/jasmine/bin/jasmine.js",
+    "build": "npm run clean && npm run babel",
+    "test": "npm run lint && npm run jasmine",
+    "deploy": "npm run build && serverless deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/champgm/aws-emailer/tree/master/lambda"
+  },
+  "keywords": [
+    "email"
+  ],
+  "author": "mac",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.7.19",
+    "babel-polyfill": "^6.20.0",
+    "mysql": "^2.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.5.2",
+    "jasmine-co": "^1.2.2",
+    "nyc": "^10.0.0"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ],
+    "plugins": [
+      "istanbul",
+      "syntax-async-functions",
+      "transform-regenerator"
+    ]
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "src/**"
+    ],
+    "exclude": [
+      "transpile/**",
+      "spec/**",
+      "node_modules/**"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false
+  },
+  "private": true
+}
