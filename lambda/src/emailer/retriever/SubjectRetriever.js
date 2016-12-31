@@ -1,21 +1,21 @@
+let mysql = require('mysql');
+
 export class SubjectRetriever {
-  static get($subjectId) {
-    var mysql = require('mysql');
-    var connection = mysql.createConnection({
-      host: 'localhost',
-      user: 'me',
-      password: 'secret',
-      database: 'my_db'
-    });
+  constructor(connection) {
+    this.connection = connection;
+  }
 
-    connection.connect();
+  async retrieve(subjectId) {
+    let queryResult = "";
+    queryHandler = function (error, results) {
+      if (error) throw error;
+      console.log(`Query returned: ${results}`);
+      queryResult = results[0];
+      console.log(`Grabbing first item: ${queryResult}`);
+    };
 
-    connection.query('SELECT 1 + 1 AS solution', function (err, rows, fields) {
-      if (err) throw err;
+    this.connection.query('select subject from subjects where id = ?', [subjectId], queryHandler);
 
-      console.log('The solution is: ', rows[0].solution);
-    });
-
-    connection.end();
+    return queryResult;
   }
 }

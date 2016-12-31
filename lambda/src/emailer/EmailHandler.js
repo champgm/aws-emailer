@@ -3,26 +3,27 @@ import BodyRetriever from './retriever/BodyRetriever';
 import SubjectRetriever from './retriever/SubjectRetriever';
 import Sender from './sender/Sender';
 
-export default class BullHornDelivery {
-  constructor(eventId, subjectId, bodyId, label) {
-    this.eventId = eventId;
-    this.subjectId = subjectId;
-    this.bodyId = bodyId;
-    this.label = label;
+export default class EmailHandler {
+  constructor(sqlConnection, dynamoTable, emailTransporter) {
+    this.dynamoTable = dynamoTable;
+    this.sqlConnection = sqlConnection;
+    this.emailTransporter = emailTransporter;
   }
 
 
-  async handle() {
-    var addressRetriever = new AddressRetriever(this.label);
-    var address = await addressRetriever.retrieve();
-    var bodyRetriever = new BodyRetriever(this.bodyId);
-    var body = await bodyRetriever.retrieve();
-    var subjectRetriever = new SubjectRetriever(this.subjectId);
-    var subject = await subjectRetriever.retrieve();
+  async handle(eventId, subjectId, bodyId, label, senderAddress) {
+    var addressRetriever = new AddressRetriever(this.sqlConnection);
+    var recipientAddress = await addressRetriever.retrieve(label);
 
+    var subjectRetriever = new SubjectRetriever(this.sqlConnection);
+    var subject = await subjectRetriever.retrieve(subjectId);
 
-    var sender = new Sender(address, subject, body);
-    await sender.send();
-    
+    var bodyRetriever = new BodyRetriever(this.dynamoTable);
+    var body = await bodyRetriever.retrieve(bodyId);
+
+    var sender = new Sender(this.emailTransporter);
+    await sender.send(recipientAddress, senderAddress, subject, body);
+
+    return 'Email handling complete.';
   }
 }
