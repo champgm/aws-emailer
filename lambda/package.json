@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf transpile",
-    "babel": "babel ./src -d ./transpile",
+    "babel": "babel ./src -d ./transpile-nodejs",
+    "typescript": "tsc --project ./src --target es6 --outDir ./transpile-es6",
     "lint": "node_modules/eslint/bin/eslint.js . --ext .js",
     "jasmine": "node_modules/jasmine/bin/jasmine.js",
     "build": "npm run clean && npm run babel",
     "test": "npm run lint && npm run jasmine",
-    "deploy": "npm run build && serverless deploy"
+    "deploy": "npm run build && serverless deploy",
+    "temp": "eslint init"
   },
   "repository": {
     "type": "git",
