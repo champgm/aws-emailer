@@ -5,12 +5,11 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf transpile-nodejs",
-    "babel": "babel ./src -d ./transpile-nodejs",
-    "lint": "eslint ./src --ext .js",
-    "build": "npm run clean && npm run babel",
+    "transpile": "babel ./src -d ./transpile-nodejs",
+    "lint": "eslint ./src --ext .js --fix",
     "test": "npm run lint && npm run jasmine",
-    "deploy": "npm run build && serverless deploy",
-    "temp": "jasmine"
+    "install": "npm run test && npm run transpile",
+    "deploy": "npm run install && serverless deploy"
   },
   "repository": {
     "type": "git",
@@ -33,7 +32,13 @@
   },
   "devDependencies": {
     "babel-core": "^6.21.0",
+    "babel-eslint": "^7.1.1",
     "eslint": "^3.12.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jasmine": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0",
     "istanbul": "^0.4.5",
     "jasmine": "^2.5.2",
     "jasmine-co": "^1.2.2",

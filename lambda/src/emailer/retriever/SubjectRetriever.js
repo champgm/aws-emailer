@@ -1,13 +1,11 @@
-let mysql = require('mysql');
-
-export class SubjectRetriever {
+export default class SubjectRetriever {
   constructor(connection) {
     this.connection = connection;
   }
 
   async retrieve(subjectId) {
-    let queryResult = "";
-    queryHandler = function (error, results) {
+    let queryResult = '';
+    const queryHandler = (error, results) => {
       if (error) throw error;
       console.log(`Query returned: ${results}`);
       queryResult = results[0];

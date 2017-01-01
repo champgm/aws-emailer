@@ -1,7 +1,9 @@
 import 'babel-polyfill';
-import EmailHandler from './EmailHandler';
-import MySQL from 'mysql';
 import AWS from 'aws-sdk';
+import MySQL from 'mysql';
+import EmailHandler from './EmailHandler';
+
+const nodemailer = require('nodemailer');
 
 module.exports.handler = async function handler(event, context, callback) {
   const message = event.Records[0].Sns.Message;
@@ -18,7 +20,7 @@ module.exports.handler = async function handler(event, context, callback) {
    */
   const inputMessage = JSON.parse(message);
 
-  //Log all of the stuff from the message, to make sure it's delivered correctly.
+  // Log all of the stuff from the message, to make sure it's delivered correctly.
   const eventId = inputMessage.id;
   const subjectId = inputMessage.subjectId;
   const bodyId = inputMessage.bodyId;
@@ -29,7 +31,7 @@ module.exports.handler = async function handler(event, context, callback) {
   console.log(`label ID: ${label}`);
 
   // Give the environment variables (from AWS) a nice name.
-  let environmentVariables = process.env;
+  const environmentVariables = process.env;
 
   /*
    *
@@ -40,7 +42,7 @@ module.exports.handler = async function handler(event, context, callback) {
    * $username = $_SERVER['RDS_USERNAME'];
    * $password = $_SERVER['RDS_PASSWORD'];
    */
-  let sqlConnection = mysql.createConnection({
+  const sqlConnection = MySQL.createConnection({
     host: `${environmentVariables.RDS_HOSTNAME}`,
     port: `${environmentVariables.RDS_PORT}`,
     database: `${environmentVariables.RDS_DB_NAME}`,
@@ -50,17 +52,16 @@ module.exports.handler = async function handler(event, context, callback) {
   this.connection.connect();
 
   // Establish connection to the dynamo table where message bodies are stored.
-  var dynamoTable = new AWS.DynamoDB({ params: { TableName: 'bodies' } });
+  const dynamoTable = new AWS.DynamoDB({ params: { TableName: 'bodies' } });
 
-  // Grab the sender account's username and password 
-  let senderUsername = environmentVariables.SENDER_ACCOUNT_USERNAME;
-  let senderPassword = environmentVariables.SENDER_ACCOUNT_PASSWORD;
-  let nodemailer = require('nodemailer');
-  let emailTransporter = nodemailer.createTransport(`smtps://${senderUsername}%40gmail.com:${senderPassword}@smtp.gmail.com`);
+  // Grab the sender account's username and password
+  const senderUsername = environmentVariables.SENDER_ACCOUNT_USERNAME;
+  const senderPassword = environmentVariables.SENDER_ACCOUNT_PASSWORD;
+  const emailTransporter = nodemailer.createTransport(`smtps://${senderUsername}%40gmail.com:${senderPassword}@smtp.gmail.com`);
 
-  let emailHandler = new EmailHandler(sqlConnection, dynamoTable, emailTransporter);
+  const emailHandler = new EmailHandler(sqlConnection, dynamoTable, emailTransporter);
   await emailHandler.handle(eventId, subjectId, bodyId, label);
 
   this.connection.end();
-  callback(null, "some kind of result");
+  callback(null, 'some kind of result');
 };

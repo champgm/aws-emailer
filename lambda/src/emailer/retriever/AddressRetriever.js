@@ -1,13 +1,11 @@
-let mysql = require('mysql');
-
-export class AddressRetriever {
+export default class AddressRetriever {
   constructor(connection) {
     this.connection = connection;
   }
 
   async retrieve(label) {
-    let queryResult = "";
-    queryHandler = function (error, results) {
+    let queryResult = '';
+    const queryHandler = (error, results) => {
       if (error) throw error;
       console.log(`Query returned: ${results}`);
       queryResult = results[0];

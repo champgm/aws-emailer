@@ -1,19 +1,17 @@
-import AWS from 'aws-sdk';
-
-export class BodyRetriever {
+export default class BodyRetriever {
   constructor(dynamoTable) {
     this.dynamoTable = dynamoTable;
   }
 
   async retrieve(bodyId) {
-    getParameters = {
+    const getParameters = {
       Key: {
         id: { S: bodyId }
       }
     };
 
-    let body = "";
-    let retrievalFunction = function (error, data) {
+    let body = '';
+    const retrievalFunction = (error, data) => {
       if (error) throw error;
 
       console.log(`Retrieved Body: ${JSON.stringify(data)}`);
