@@ -1,14 +1,14 @@
 branch-defaults:
-  master:
-    environment: LowCost-env
+  default:
+    environment: Custom-env
 environment-defaults:
-  LowCost-env:
+  Custom-env:
     branch: null
     repository: null
 global:
-  application_name: Emailer
+  application_name: php-lambda-emailer
   default_ec2_keyname: null
   default_platform: 64bit Amazon Linux 2016.09 v2.3.0 running PHP 7.0
   default_region: us-west-2
-  profile: mine
-  sc: git
+  profile: null
+  sc: null

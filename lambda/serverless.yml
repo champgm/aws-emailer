@@ -56,17 +56,28 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
+package:
+ exclude:
+   - src/**
+   - spec/**w
+   - package.json
+   - serverless.yml
+   - .eslintignore
+   - .eslintrc
+   - .npmignore
+   - .serverless/**
+   - node_modules/**
+ include:
+   - transpile-nodejs/*
+   - node_modules/aws-sdk/**
+   - node_modules/babel-polyfill/**
+   - node_modules/mysql/**
+   - node_modules/nodemailer/**
+   - node_modules/bluebird/**
 
 functions:
   emailer:
-    handler: build/emailer/emailer.handler
+    handler: transpile-nodejs/emailer/index.handler
     events:
       - sns: emailer_entrypoint
 

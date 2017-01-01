@@ -22,6 +22,7 @@
     "no-plusplus": [2, {
       "allowForLoopAfterthoughts": true
     }],
+    "prefer-rest-params": [0],
     "jasmine/no-spec-dupes": [0]
   },
   "extends": [
