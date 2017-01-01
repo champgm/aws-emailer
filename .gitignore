@@ -6,3 +6,5 @@
 **/vendor
 **/composer.phar
 **/node_modules
+**/transpile*
+**/npm-debug.log
