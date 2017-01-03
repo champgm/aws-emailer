@@ -25,7 +25,7 @@ export default class MessageSender extends Logger {
       if (error) throw error;
       sendResult = info.response;
     };
-    this.emailTransporter.sendMail(mailOptions, sendFunction);
+    await this.emailTransporter.sendMail(mailOptions, sendFunction);
     this.log(`Email sent: ${sendResult}`);
 
     return sendResult;

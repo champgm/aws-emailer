@@ -11,7 +11,7 @@
     "test": "npm run lint && npm run jasmine",
     "install": "npm run test && npm run transpile",
     "deploy": "npm run install && serverless deploy",
-    "deploy": "npm run install && serverless deploy function -f emailer",
+    "update": "npm run install && serverless deploy function -f emailer",
     "temp": "eslint"
   },
   "repository": {

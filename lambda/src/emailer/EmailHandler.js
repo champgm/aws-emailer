@@ -5,19 +5,19 @@ import MessageSender from './sender/MessageSender';
 import Logger from './util/Logger';
 
 export default class EmailHandler extends Logger {
-  constructor(mysqlConnectionHelper, dynamoTable, emailTransporter) {
+  constructor(mysqlConnection, dynamoTable, emailTransporter) {
     super();
     this.dynamoTable = dynamoTable;
-    this.mysqlConnectionHelper = mysqlConnectionHelper;
+    this.mysqlConnection = mysqlConnection;
     this.emailTransporter = emailTransporter;
   }
 
 
   async handle(eventId, subjectId, bodyId, label, senderAddress) {
-    const addressRetriever = new AddressRetriever(this.mysqlConnectionHelper);
+    const addressRetriever = new AddressRetriever(this.mysqlConnection);
     const recipientAddressPromise = addressRetriever.retrieve(label);
 
-    const subjectRetriever = new SubjectRetriever(this.mysqlConnectionHelper);
+    const subjectRetriever = new SubjectRetriever(this.mysqlConnection);
     const subjectPromise = subjectRetriever.retrieve(subjectId);
 
     const bodyRetriever = new BodyRetriever(this.dynamoTable);

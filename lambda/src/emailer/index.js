@@ -61,10 +61,9 @@ module.exports.handler = async function handler(event, context, callback) {
     // In my opinion, this is probably bad form. I HATE when I receieve an object and
     // don't know it's structure, but I don't want to pass two parameters when I
     // could pass just one.
-    const mysqlConnectionHelper = {
-      mysqlClient,
-      sqlConnectionParameters
-    };
+    const mysqlConnection = Promise.promisifyAll(mysqlClient.createConnection(sqlConnectionParameters));
+    await mysqlConnection.connect();
+
 
     // Establish connection to the dynamo table where message bodies are stored.
     console.log('Configuring DynamoDB client...');
@@ -79,11 +78,12 @@ module.exports.handler = async function handler(event, context, callback) {
     const emailTransporter = Promise.promisifyAll(nodemailer.createTransport(`smtps://${senderUsername}%40gmail.com:${senderPassword}@smtp.gmail.com`));
 
     console.log('Calling Handler...');
-    const emailHandler = new EmailHandler(mysqlConnectionHelper, dynamoTable, emailTransporter);
+    const emailHandler = new EmailHandler(mysqlConnection, dynamoTable, emailTransporter);
     await emailHandler.handle(eventId, subjectId, bodyId, label);
     console.log('Handled.');
 
     console.log('Closing MySQL connection...');
+
   } catch (error) {
     callback(error);
   }

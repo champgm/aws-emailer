@@ -4,6 +4,7 @@
 !.elasticbeanstalk/*.global.yml
 
 **/vendor
+**/.serverless
 **/composer.phar
 **/node_modules
 **/transpile*
