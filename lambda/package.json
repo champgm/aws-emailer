@@ -7,12 +7,14 @@
     "clean": "rm -rf transpile-nodejs",
     "transpile": "babel ./src -d ./transpile-nodejs",
     "lint": "eslint ./src ./spec --ext .js --fix",
-    "jasmine": "jasmine --color --verbose",
+    "jasmine": "jasmine",
     "test": "npm run lint && npm run jasmine",
     "install": "npm run test && npm run transpile",
     "deploy": "npm run install && serverless deploy",
-    "update": "npm run install && serverless deploy function -f emailer",
-    "temp": "eslint"
+    "deployfunction": "serverless deploy function -f emailer",
+    "update": "npm run install && npm run deployfunction",
+    "submit": "jasmine 'spec/emailer/sendEvent.js'",
+    "doitlive": "npm run clean && npm run lint && npm run transpile && npm run deployfunction"
   },
   "repository": {
     "type": "git",
@@ -25,21 +27,22 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.7.19",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-regenerator": "^6.21.0",
     "babel-polyfill": "^6.20.0",
+    "babel-register": "^6.18.0",
     "bluebird": "^3.4.7",
     "jasmine-co": "^1.2.2",
     "mysql": "^2.12.0",
-    "nodemailer": "^2.7.0"
+    "nodemailer": "^2.7.0",
+    "nodemailer-smtp-transport": "^2.7.2",
+    "promise-mysql": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
     "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
     "babel-plugin-istanbul": "^3.0.0",
-    "babel-plugin-syntax-async-functions": "^6.13.0",
-    "babel-plugin-transform-regenerator": "^6.21.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-register": "^6.18.0",
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",

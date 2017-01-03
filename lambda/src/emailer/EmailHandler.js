@@ -1,5 +1,5 @@
-import AddressRetriever from './retriever/AddressRetriever';
 import BodyRetriever from './retriever/BodyRetriever';
+import RecipientRetriever from './retriever/RecipientRetriever';
 import SubjectRetriever from './retriever/SubjectRetriever';
 import MessageSender from './sender/MessageSender';
 import Logger from './util/Logger';
@@ -14,21 +14,31 @@ export default class EmailHandler extends Logger {
 
 
   async handle(eventId, subjectId, bodyId, label, senderAddress) {
-    const addressRetriever = new AddressRetriever(this.mysqlConnection);
-    const recipientAddressPromise = addressRetriever.retrieve(label);
+    this.log('Calling recipient retriever...');
+    const recipientRetriever = new RecipientRetriever(this.mysqlConnection);
+    const recipientAddressPromise = recipientRetriever.retrieve(label);
 
+    this.log('Awaiting recipient...');
+    const recipientAddress = await recipientAddressPromise;
+
+    this.log('Calling subject retriever...');
     const subjectRetriever = new SubjectRetriever(this.mysqlConnection);
     const subjectPromise = subjectRetriever.retrieve(subjectId);
 
+    this.log('Awaiting subject...');
+    const subject = await subjectPromise;
+
+    this.log('Calling body retriever...');
     const bodyRetriever = new BodyRetriever(this.dynamoTable);
     const bodyPromise = bodyRetriever.retrieve(bodyId);
 
-    const recipientAddress = await recipientAddressPromise;
-    const subject = await subjectPromise;
+    this.log('Awaiting body...');
     const body = await bodyPromise;
+
+    this.log(`Body: ${body}`);
     this.log(`Recipient: ${recipientAddress}`);
     this.log(`Subject: ${subject}`);
-    this.log(`Body: ${body}`);
+
 
     const messageSender = new MessageSender(this.emailTransporter);
     await messageSender.send(recipientAddress, senderAddress, subject, body);

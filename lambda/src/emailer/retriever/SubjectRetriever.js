@@ -1,30 +1,48 @@
 import Logger from '../util/Logger';
 
+/**
+ * Retrieves an email subject from the subjects table
+ *
+ * @export
+ * @class SubjectRetriever
+ * @extends {Logger}
+ */
 export default class SubjectRetriever extends Logger {
-  constructor(mysqlConnectionHelper) {
+
+  /**
+   * Creates an instance of SubjectRetriever.
+   *
+   * @param {any} mysqlConnection - A pre-connected, bluebird-promisified connection to MySQL
+   *
+   * @memberOf SubjectRetriever
+   */
+  constructor(mysqlConnection) {
     super();
-    this.mysqlConnectionHelper = mysqlConnectionHelper;
+    this.mysqlConnection = mysqlConnection;
   }
 
+  /**
+   * Retrieves a subject from the subjects table corresponding to the given SubjectID
+   *
+   * @param {any} subjectId - The row key for the desired subject
+   * @returns the corresponding subject
+   *
+   * @memberOf SubjectRetriever
+   */
   async retrieve(subjectId) {
-    this.log('Connecting to MySQL to retireve subject.');
+    this.log('Querying MySQL to retireve subject.');
 
-    const connection = this.mysqlConnectionHelper.mysqlClient
-      .createConnection(this.mysqlConnectionHelper.sqlConnectionParameters);
-    connection.connect();
+    // Promisified connection...
+    const subject = await this.mysqlConnection
+      // Query with the new bluebird method...
+      .queryAsync('select subject from subjects where id = ?', [subjectId])
+      // Then take the result of the query and find the subject inside.
+      .then((result) => {
+        this.log(`Query result: ${JSON.stringify(result)}`);
+        return result[0].subject;
+      });
 
-    let queryResult = '';
-    const queryHandler = (error, results) => {
-      if (error) throw error;
-      this.log(`Query returned subject: ${JSON.stringify(results)}`);
-      queryResult = results[0].subject;
-      this.log(`Grabbing first subject: ${JSON.stringify(queryResult)}`);
-    };
-
-    connection.query('select subject from subjects where id = ?', [subjectId], queryHandler);
-    this.log(`Subject retrieved: ${queryResult}`);
-    await connection.end();
-
-    return queryResult;
+    this.log(`Subject retrieved: ${subject}`);
+    return subject;
   }
 }
