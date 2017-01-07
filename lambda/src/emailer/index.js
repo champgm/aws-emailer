@@ -7,14 +7,22 @@ const mysql = require('mysql');
 const Connection = require('mysql/lib/Connection');
 const nodemailer = require('nodemailer');
 
-// This must be like this. I don't know why.
+// This must be like this. I don't know why. This thing has to be promisified
+// with "promisifiyAll" and it MUST be in an array, otherwise this process will
+// crash SILENTLY.
 // I hate bluebird.
 // TODO: Learn how to promisify stuff myself.
 Promise.promisifyAll([Connection]);
 
 /**
- * Pulls needed values from environment variables and creates a
- * connected, promisified instance of a MySQL connection.
+ * Creates a bluebird-promisified MySQL connection with the given parameters
+ *
+ * @param {any} host - The sever to which a connection will be established
+ * @param {any} port - The port to use
+ * @param {any} database - The name of the database
+ * @param {any} user - The username to use
+ * @param {any} password - The password corresponding to the username
+ * @returns
  */
 async function getMysqlConnection(host, port, database, user, password) {
   console.log('Configuring MySQL connection...');
@@ -42,6 +50,14 @@ async function getMysqlConnection(host, port, database, user, password) {
   return mysqlConnection;
 }
 
+/**
+ * Creates a bluebird-promisified instance of nodemailer which will use
+ * GMail as the sending server
+ *
+ * @param {any} senderUsername - The GMail username
+ * @param {any} senderPassword - The password for that user
+ * @returns
+ */
 async function getNodeEmailer(senderUsername, senderPassword) {
   const smtpConfig = {
     host: 'smtp.gmail.com',
@@ -55,6 +71,7 @@ async function getNodeEmailer(senderUsername, senderPassword) {
     debug: true
   };
 
+  // Why doesn't THIS thing need to be in an array when passed to promisifiyAll ?????
   const emailTransporter = Promise.promisifyAll(nodemailer.createTransport(smtpConfig));
   return emailTransporter;
 }
@@ -89,15 +106,14 @@ module.exports.handler = async function handler(event, context, callback) {
   console.log(`bodyId ID: ${bodyId}`);
   console.log(`label ID: ${label}`);
 
-  // Construct the sender address from environment variables
-  const senderUsername = environmentVariables.SENDER_ACCOUNT_USERNAME;
-  const senderAddress = `${senderUsername}@gmail.com`;
-
   console.log('Configuring DynamoDB client...');
   const dynamoTable = new AWS.DynamoDB({ params: { TableName: 'bodies' } });
   Promise.promisifyAll(Object.getPrototypeOf(dynamoTable));
 
-
+  // Construct the sender address from environment variables
+  const senderUsername = environmentVariables.SENDER_ACCOUNT_USERNAME;
+  const senderAddress = `${senderUsername}@gmail.com`;
+  // Pass them into the nodemailer creation function
   console.log('Configuring nodemailer...');
   const emailTransporter = await getNodeEmailer(
     environmentVariables.SENDER_ACCOUNT_USERNAME,
@@ -113,11 +129,14 @@ module.exports.handler = async function handler(event, context, callback) {
     environmentVariables.RDS_PASSWORD
   );
 
+  // Once you have gathered all of the dependencies, construct and call the EmailHandler
   console.log('Calling Handler...');
   const emailHandler = new EmailHandler(mysqlConnection, dynamoTable, emailTransporter);
   await emailHandler.handle(eventId, subjectId, bodyId, label, senderAddress);
   console.log('Handled.');
 
+  // Don't forget to close the MySQL connection!
+  // If you don't, the lambda will run until it times out... $$$$$
   console.log('Closing MySQL connection...');
   await mysqlConnection.endAsync();
   console.log('Email successfully sent.');
