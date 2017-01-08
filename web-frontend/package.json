@@ -1,0 +1,30 @@
+{
+  "name": "web-frontend",
+  "version": "1.0.0",
+  "description": "web frontend for lambda emailer",
+  "main": "index.php",
+  "scripts": {
+    "test": "NONE",
+    "concurrently": "concurrently",
+    "server": "php -S 127.0.0.1:1980",
+    "watch": "browser-sync start --proxy 127.0.0.1:1980 --directory --files \"**/*\"",
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run monitor\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/champgm/aws-emailer.git"
+  },
+  "keywords": [
+    "email"
+  ],
+  "author": "macandna",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/champgm/aws-emailer/issues"
+  },
+  "homepage": "https://github.com/champgm/aws-emailer#readme",
+  "dependencies": {
+    "browser-sync": "^2.18.6",
+    "concurrently": "^3.1.0"
+  }
+}

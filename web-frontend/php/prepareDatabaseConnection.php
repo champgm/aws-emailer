@@ -1,12 +1,12 @@
 <?php
 
-$dbhost = $_SERVER['RDS_HOSTNAME'];
-$dbport = $_SERVER['RDS_PORT'];
-$dbname = $_SERVER['RDS_DB_NAME'];
+$dbhost = getenv('RDS_HOSTNAME');
+$dbport = getenv('RDS_PORT');
+$dbname = getenv('RDS_DB_NAME');
 
 $dsn = "mysql:host={$dbhost};port={$dbport};dbname={$dbname}";
-$username = $_SERVER['RDS_USERNAME'];
-$password = $_SERVER['RDS_PASSWORD'];
+$username = getenv('RDS_USERNAME');
+$password = getenv('RDS_PASSWORD');
 
 $dbh = new PDO($dsn, $username, $password);
 $dbh->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );

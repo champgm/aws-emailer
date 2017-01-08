@@ -23,7 +23,7 @@
   "keywords": [
     "email"
   ],
-  "author": "mac",
+  "author": "macandna",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.7.19",

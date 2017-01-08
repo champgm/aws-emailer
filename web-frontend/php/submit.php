@@ -36,7 +36,7 @@ function submit_sns($eventId, $label, $subjectId, $bodyId)
     $snsSubject = "Email Event with ID: $eventId";
     $snsMessage = json_encode($snsMessageArray);
     $snsData = array(
-      'TopicArn' => $_SERVER['SNS_ARN'],
+      'TopicArn' => getenv('SNS_ARN'),
       'Message' => $snsMessage,
       'Subject' => $snsSubject,
       'MessageStructure' => 'json',
@@ -90,8 +90,8 @@ if (!empty($_POST)) {
             $eventId = UUID::v4();
             $label = $_POST['label'];
             $subject = $_POST['subject'];
-            $body = 'no text';
-            if (isset($_POST['body'])) {
+            $body = '     ';
+            if (!empty($_POST['body'])) {
                 $body = $_POST['body'];
             }
 
@@ -103,7 +103,7 @@ if (!empty($_POST)) {
             $subjectId = store_subject($eventId, $subject, $dbh);
             div_print("Sending the body...");
             $bodyId = store_body($eventId, $body);
-            div_print("Submitting all...");
+            div_print("Submitting SNS...");
             submit_sns($eventId, $label, $subjectId, $bodyId);
             div_print("Done.");
         } else {
