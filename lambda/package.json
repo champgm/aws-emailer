@@ -6,14 +6,15 @@
   "scripts": {
     "clean": "rm -rf transpile-nodejs",
     "transpile": "babel ./src -d ./transpile-nodejs",
-    "lint": "eslint ./src ./spec --ext .js --fix",
+    "nyc": "nyc",
     "jasmine": "jasmine",
-    "test": "npm run lint && npm run jasmine",
+    "lint": "eslint ./src ./spec --ext .js --fix",
+    "lint-and-jasmine": "npm run lint && npm run jasmine",
+    "test": "npm run nyc npm run lint-and-jasmine",
     "install": "npm run test && npm run transpile",
     "deploy": "npm run install && serverless deploy",
-    "deployfunction": "serverless deploy function -f emailer",
     "update": "npm run install && npm run deployfunction",
-    "submit": "jasmine 'spec/emailer/sendEvent.js'",
+    "deployfunction": "serverless deploy function -f emailer",
     "doitlive": "npm run clean && npm run lint && npm run transpile && npm run deployfunction"
   },
   "repository": {
@@ -69,12 +70,16 @@
       "src/**"
     ],
     "exclude": [
-      "transpile/**",
+      "transpile-nodejs/**",
       "spec/**",
       "node_modules/**"
     ],
     "require": [
       "babel-register"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
     ],
     "sourceMap": false,
     "instrument": false

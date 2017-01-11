@@ -9,3 +9,5 @@
 **/node_modules
 **/transpile*
 **/npm-debug.log
+**/.nyc_output
+**/coverage

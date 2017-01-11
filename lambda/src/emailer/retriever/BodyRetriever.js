@@ -1,4 +1,5 @@
 import Logger from '../util/Logger';
+import Preconditions from '../util/Preconditions';
 
 /**
  * Retrieves a message body from the bodies dynamo table
@@ -19,7 +20,7 @@ export default class BodyRetriever extends Logger {
    */
   constructor(dynamoTable) {
     super();
-    this.dynamoTable = dynamoTable;
+    this.dynamoTable = Preconditions.ensureNotNullOrEmpty(dynamoTable, 'dynamoTable may not be null or empty');
   }
 
   /**
@@ -31,6 +32,10 @@ export default class BodyRetriever extends Logger {
    * @memberOf BodyRetriever
    */
   async retrieve(bodyId) {
+    if (Preconditions.isNullOrEmpty(bodyId)) {
+      return Promise.reject('bodyId may not be null or empty');
+    }
+
     // Parameters are pretty simple... just the body ID
     const getParameters = {
       Key: {
@@ -38,15 +43,18 @@ export default class BodyRetriever extends Logger {
       }
     };
 
-
     // Promisified DynamoDB
     const body = await this.dynamoTable
       // Get with the new bluebird method...
       .getItemAsync(getParameters)
-      // Sorry, this part is a little ridiculous.
+      // The body sttring is way down in there.
       .then((result) => {
         this.log(`Get result: ${JSON.stringify(result)}`);
         return result.Item.body.S;
+      })
+      .catch((error) => {
+        this.log(`Get result FAILED: ${JSON.stringify(error)}`);
+        return Promise.reject(error);
       });
 
     return body;

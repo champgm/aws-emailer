@@ -7,8 +7,8 @@
     "test": "NONE",
     "concurrently": "concurrently",
     "server": "php -S 127.0.0.1:1980",
-    "watch": "browser-sync start --proxy 127.0.0.1:1980 --directory --files \"**/*\"",
-    "dev": "concurrently --kill-others \"npm run server\" \"npm run monitor\""
+    "browsersync": "browser-sync start --proxy 127.0.0.1:1980 --directory --files \"**/*\"",
+    "deploy": "git commit -a -m 'deploying...' || true && eb deploy && eb open"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,7 @@
     "url": "https://github.com/champgm/aws-emailer/issues"
   },
   "homepage": "https://github.com/champgm/aws-emailer#readme",
-  "dependencies": {
-    "browser-sync": "^2.18.6",
-    "concurrently": "^3.1.0"
+  "devDependencies": {
+    "browser-sync": "^2.18.6"
   }
 }
