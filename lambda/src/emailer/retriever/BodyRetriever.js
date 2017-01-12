@@ -35,6 +35,7 @@ export default class BodyRetriever extends Logger {
     if (Preconditions.isNullOrEmpty(bodyId)) {
       return Promise.reject('bodyId may not be null or empty');
     }
+    this.log('Getting the message body from DynamoDB.');
 
     // Parameters are pretty simple... just the body ID
     const getParameters = {
@@ -57,6 +58,7 @@ export default class BodyRetriever extends Logger {
         return Promise.reject(error);
       });
 
+    this.log(`Body retrieved: ${body}`);
     return body;
   }
 }

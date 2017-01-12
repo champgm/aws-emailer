@@ -1,4 +1,5 @@
 import Logger from '../util/Logger';
+import Preconditions from '../util/Preconditions';
 
 /**
  * Retrieves an email subject from the subjects table
@@ -18,7 +19,7 @@ export default class SubjectRetriever extends Logger {
    */
   constructor(mysqlConnection) {
     super();
-    this.mysqlConnection = mysqlConnection;
+    this.mysqlConnection = Preconditions.ensureNotNullOrEmpty(mysqlConnection, 'mysqlConnection may not be null or empty');
   }
 
   /**
@@ -30,6 +31,10 @@ export default class SubjectRetriever extends Logger {
    * @memberOf SubjectRetriever
    */
   async retrieve(subjectId) {
+    if (Preconditions.isNullOrEmpty(subjectId)) {
+      return Promise.reject('subjectId may not be null or empty');
+    }
+
     this.log('Querying MySQL to retireve subject.');
 
     // Promisified connection...

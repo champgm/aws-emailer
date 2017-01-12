@@ -1,4 +1,5 @@
 import Logger from '../util/Logger';
+import Preconditions from '../util/Preconditions';
 
 /**
  * A class to send email messages.
@@ -18,7 +19,7 @@ export default class MessageSender extends Logger {
    */
   constructor(emailTransporter) {
     super();
-    this.emailTransporter = emailTransporter;
+    this.emailTransporter = Preconditions.ensureNotNullOrEmpty(emailTransporter, 'emailTransporter may not be null or empty');
   }
 
   /**
@@ -33,6 +34,11 @@ export default class MessageSender extends Logger {
    * @memberOf MessageSender
    */
   async send(recipientAddress, senderAddress, subject, body) {
+    if (Preconditions.isNullOrEmpty(recipientAddress)) return Promise.reject('recipientAddress may not be null or empty');
+    if (Preconditions.isNullOrEmpty(senderAddress)) return Promise.reject('senderAddress may not be null or empty');
+    if (Preconditions.isNullOrEmpty(subject)) return Promise.reject('subject may not be null or empty');
+    if (Preconditions.isNullOrEmpty(body)) return Promise.reject('body may not be null or empty');
+
     // The details of th email to send
     const mailOptions = {
       from: `"To Do" <${senderAddress}>`,

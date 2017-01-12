@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import BodyRetriever from '../../../src/emailer/retriever/BodyRetriever';
+import ErrorChecker from '../../ErrorChecker';
 
 require('jasmine-co').install();
 
@@ -24,12 +25,10 @@ describe('BodyRetriever Specifications:', () => {
 
   describe('Preconditions Specifications:', () => {
     let bodyRetriever;
-    let thrown;
+    let bodyIdError;
     beforeAll(() => {
       bodyRetriever = new BodyRetriever(dummyDynamoTable);
-    });
-    beforeEach(() => {
-      thrown = false;
+      bodyIdError = 'bodyId may not be null or empty';
     });
     describe('When instantiated without a Dynamo Table,', () => {
       it('an error should be thrown.', () => {
@@ -47,35 +46,20 @@ describe('BodyRetriever Specifications:', () => {
     });
     describe('When retrieve is called without a body ID and wrapped in a try/catch,', () => {
       it('An error should be caught.', async () => {
-        try {
-          await bodyRetriever.retrieve();
-        } catch (error) {
-          thrown = true;
-          expect(error).toEqual('bodyId may not be null or empty');
-        }
-        expect(thrown).toBe(true);
+        const call = async () => { await bodyRetriever.retrieve(); };
+        expect(await ErrorChecker.checkForError(call, bodyIdError)).toBe(true);
       });
     });
     describe('When retrieve is called with a null body ID and wrapped in a try/catch,', () => {
       it('An error should be caught.', async () => {
-        try {
-          await bodyRetriever.retrieve(null);
-        } catch (error) {
-          thrown = true;
-          expect(error).toEqual('bodyId may not be null or empty');
-        }
-        expect(thrown).toBe(true);
+        const call = async () => { await bodyRetriever.retrieve(null); };
+        expect(await ErrorChecker.checkForError(call, bodyIdError)).toBe(true);
       });
     });
     describe('When retrieve is called with an undefined body ID and wrapped in a try/catch,', () => {
       it('An error should be caught.', async () => {
-        try {
-          await bodyRetriever.retrieve(undefined);
-        } catch (error) {
-          thrown = true;
-          expect(error).toEqual('bodyId may not be null or empty');
-        }
-        expect(thrown).toBe(true);
+        const call = async () => { await bodyRetriever.retrieve(undefined); };
+        expect(await ErrorChecker.checkForError(call, bodyIdError)).toBe(true);
       });
     });
   });
@@ -95,7 +79,6 @@ describe('BodyRetriever Specifications:', () => {
         };
         const bodyRetriever = new BodyRetriever(spyDynamoTable);
         const retrievedBody = await bodyRetriever.retrieve(bodyId);
-
         expect(retrievedBody).toEqual(bodyContents);
       });
     });
@@ -111,14 +94,8 @@ describe('BodyRetriever Specifications:', () => {
           }
         };
         const bodyRetriever = new BodyRetriever(spyDynamoTable);
-        let thrown = false;
-        try {
-          await bodyRetriever.retrieve(bodyId);
-        } catch (error) {
-          thrown = true;
-          expect(error).toEqual(mockedRejection);
-        }
-        expect(thrown).toBe(true);
+        const call = async () => { await bodyRetriever.retrieve(bodyId); };
+        expect(await ErrorChecker.checkForError(call, mockedRejection)).toBe(true);
       });
     });
   });

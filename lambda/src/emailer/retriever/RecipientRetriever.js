@@ -1,4 +1,5 @@
 import Logger from '../util/Logger';
+import Preconditions from '../util/Preconditions';
 
 /**
  * Retrieves a recipient from the destinations table
@@ -18,7 +19,7 @@ export default class RecipientRetriever extends Logger {
    */
   constructor(mysqlConnection) {
     super();
-    this.mysqlConnection = mysqlConnection;
+    this.mysqlConnection = Preconditions.ensureNotNullOrEmpty(mysqlConnection, 'mysqlConnection may not be null or empty');
   }
 
   /**
@@ -30,6 +31,10 @@ export default class RecipientRetriever extends Logger {
    * @memberOf RecipientRetriever
    */
   async retrieve(label) {
+    if (Preconditions.isNullOrEmpty(label)) {
+      return Promise.reject('label may not be null or empty');
+    }
+
     this.log('Querying MySQL to retireve recipient address.');
 
     // Promisified connection...
@@ -40,6 +45,10 @@ export default class RecipientRetriever extends Logger {
       .then((result) => {
         this.log(`Query result: ${JSON.stringify(result)}`);
         return result[0].address;
+      })
+      .catch((error) => {
+        this.log(`Query FAILED: ${JSON.stringify(error)}`);
+        return Promise.reject(error);
       });
 
     this.log(`Recipient retrieved: ${address}`);

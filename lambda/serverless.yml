@@ -43,3 +43,17 @@ functions:
     handler: transpile-nodejs/emailer/index.handler
     events:
       - sns: emailer_entrypoint
+
+# resources:
+#    Resources:
+#     TestSQS:
+#       Type : AWS::SQS::Queue
+#     TestSNS:
+#       Type: AWS::SNS::Topic
+#       Properties:
+#         Subscription:
+#           - Endpoint:
+#               Fn::GetAtt:
+#                 - TestSQS
+#                 - Arn
+#             Protocol: sqs
