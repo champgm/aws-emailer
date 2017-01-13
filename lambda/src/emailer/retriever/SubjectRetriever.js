@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Logger from '../util/Logger';
 import Preconditions from '../util/Preconditions';
 
@@ -38,14 +39,25 @@ export default class SubjectRetriever extends Logger {
     this.log('Querying MySQL to retireve subject.');
 
     // Promisified connection...
-    const subject = await this.mysqlConnection
-      // Query with the new bluebird method...
-      .queryAsync('select subject from subjects where id = ?', [subjectId])
-      // Then take the result of the query and find the subject inside.
-      .then((result) => {
-        this.log(`Query result: ${JSON.stringify(result)}`);
-        return result[0].subject;
-      });
+    let subject;
+    try {
+      subject = await this.mysqlConnection
+        // Query with the new bluebird method...
+        .queryAsync('select subject from subjects where id = ?', [subjectId])
+        // Then take the result of the query and find the subject inside.
+        .then((result) => {
+          this.log(`Query result: ${JSON.stringify(result)}`);
+          return result[0].subject;
+        });
+    } catch (error) {
+      this.log('Error awaiting subject retrieval!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
+    // .catch((error) => {
+    //   this.log(`Query FAILED: ${JSON.stringify(error)}`);
+    //   return Promise.reject(error);
+    // });
 
     this.log(`Subject retrieved: ${subject}`);
     return subject;

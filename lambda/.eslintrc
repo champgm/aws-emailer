@@ -13,7 +13,9 @@
   },
   "rules": {
     "comma-dangle": [0],
-    "max-len": [1],
+    "max-len": [1, {
+      "code": 200
+    }],
     "no-param-reassign": [2, {
       "props": false
     }],
@@ -23,7 +25,10 @@
       "allowForLoopAfterthoughts": true
     }],
     "prefer-rest-params": [0],
-    "jasmine/no-spec-dupes": [0]
+    "jasmine/no-spec-dupes": [0],
+    "valid-jsdoc": [2, {
+      "requireReturnType": false
+    }]
   },
   "extends": [
     "airbnb",

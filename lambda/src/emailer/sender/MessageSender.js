@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Logger from '../util/Logger';
 import Preconditions from '../util/Preconditions';
 
@@ -46,7 +47,6 @@ export default class MessageSender extends Logger {
       subject: `${subject}`,
       text: `${body}`
     };
-    this.log(`Mail Options: ${JSON.stringify(mailOptions)}`);
 
     this.log('Sending email...');
     // Promisified sender...
@@ -54,7 +54,11 @@ export default class MessageSender extends Logger {
       // Send with the promisifed method
       .sendMailAsync(mailOptions)
       // Return the result
-      .then(thing => thing);
+      .then(thing => thing)
+      .catch((error) => {
+        this.log(`Sending FAILED: ${JSON.stringify(error)}`);
+        return Promise.reject(error);
+      });
 
     this.log(`Email sent: ${JSON.stringify(sendResult)}`);
     return sendResult;

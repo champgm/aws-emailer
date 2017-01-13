@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Logger from '../util/Logger';
 import Preconditions from '../util/Preconditions';
 
@@ -45,18 +46,25 @@ export default class BodyRetriever extends Logger {
     };
 
     // Promisified DynamoDB
-    const body = await this.dynamoTable
-      // Get with the new bluebird method...
-      .getItemAsync(getParameters)
-      // The body sttring is way down in there.
-      .then((result) => {
-        this.log(`Get result: ${JSON.stringify(result)}`);
-        return result.Item.body.S;
-      })
-      .catch((error) => {
-        this.log(`Get result FAILED: ${JSON.stringify(error)}`);
-        return Promise.reject(error);
-      });
+    let body;
+    try {
+      body = await this.dynamoTable
+        // Get with the new bluebird method...
+        .getItemAsync(getParameters)
+        // The body sttring is way down in there.
+        .then((result) => {
+          this.log(`Get result: ${JSON.stringify(result)}`);
+          return result.Item.body.S;
+        });
+    } catch (error) {
+      this.log('Error awaiting body retrieval!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
+    //   .catch((error) => {
+    //   this.log(`Get result FAILED: ${JSON.stringify(error)}`);
+    //   return Promise.reject(error);
+    // });
 
     this.log(`Body retrieved: ${body}`);
     return body;
