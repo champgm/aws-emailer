@@ -23,7 +23,10 @@
       "allowForLoopAfterthoughts": true
     }],
     "prefer-rest-params": [0],
-    "jasmine/no-spec-dupes": [0]
+    "jasmine/no-spec-dupes": [0],
+    "valid-jsdoc": [2, {
+      "requireReturnType": false
+    }]
   },
   "extends": [
     "airbnb",

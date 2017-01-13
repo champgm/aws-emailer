@@ -14,7 +14,7 @@ const nodemailer = require('nodemailer');
 // TODO: Learn how to promisify stuff myself.
 Promise.promisifyAll([Connection]);
 
-/**
+/*
  * Creates a bluebird-promisified MySQL connection with the given parameters
  *
  * @param {any} host - The sever to which a connection will be established
@@ -50,7 +50,7 @@ async function getMysqlConnection(host, port, database, user, password) {
   return mysqlConnection;
 }
 
-/**
+/*
  * Creates a bluebird-promisified instance of nodemailer which will use
  * GMail as the sending server
  *
@@ -76,7 +76,7 @@ async function getNodeEmailer(senderUsername, senderPassword) {
   return emailTransporter;
 }
 
-/**
+/*
  * Main entrypoint to lambda emailer
  *
  * @param {any} event
