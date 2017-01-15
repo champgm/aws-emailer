@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Logger from '../util/Logger';
 import Preconditions from '../util/Preconditions';
 
@@ -38,18 +39,21 @@ export default class RecipientRetriever extends Logger {
     this.log('Querying MySQL to retireve recipient address.');
 
     // Promisified connection...
-    const address = await this.mysqlConnection
-      // Query with the new bluebird method...
-      .queryAsync('select address from destinations where label = ?', [label])
-      // Then take the result of the query and find the subject inside.
-      .then((result) => {
-        this.log(`Query result: ${JSON.stringify(result)}`);
-        return result[0].address;
-      })
-      .catch((error) => {
-        this.log(`Query FAILED: ${JSON.stringify(error)}`);
-        return Promise.reject(error);
-      });
+    let address;
+    try {
+      address = await this.mysqlConnection
+        // Query with the new bluebird method...
+        .queryAsync('select address from destinations where label = ?', [label])
+        // Then take the result of the query and find the subject inside.
+        .then((result) => {
+          this.log(`Query result: ${JSON.stringify(result)}`);
+          return result[0].address;
+        });
+    } catch (error) {
+      this.log('Error awaiting address retrieval!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
 
     this.log(`Recipient retrieved: ${address}`);
     return address;

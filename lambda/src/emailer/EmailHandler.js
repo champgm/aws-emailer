@@ -1,8 +1,11 @@
-import BodyRetriever from './retriever/BodyRetriever';
+import Promise from 'bluebird';
 import RecipientRetriever from './retriever/RecipientRetriever';
 import SubjectRetriever from './retriever/SubjectRetriever';
+import BodyRetriever from './retriever/BodyRetriever';
 import MessageSender from './sender/MessageSender';
+import Preconditions from './util/Preconditions';
 import Logger from './util/Logger';
+
 
 /**
  * A class for gathering all dependencies for sending
@@ -26,9 +29,9 @@ export default class EmailHandler extends Logger {
    */
   constructor(mysqlConnection, dynamoTable, emailTransporter) {
     super();
-    this.dynamoTable = dynamoTable;
-    this.mysqlConnection = mysqlConnection;
-    this.emailTransporter = emailTransporter;
+    this.mysqlConnection = Preconditions.ensureNotNullOrEmpty(mysqlConnection, 'mysqlConnection may not be null or empty');
+    this.dynamoTable = Preconditions.ensureNotNullOrEmpty(dynamoTable, 'dynamoTable may not be null or empty');
+    this.emailTransporter = Preconditions.ensureNotNullOrEmpty(emailTransporter, 'emailTransporter may not be null or empty');
   }
 
   /**
@@ -44,6 +47,12 @@ export default class EmailHandler extends Logger {
    * @memberOf EmailHandler
    */
   async handle(eventId, subjectId, bodyId, label, senderAddress) {
+    if (Preconditions.isNullOrEmpty(eventId)) return Promise.reject('eventId may not be null or empty');
+    if (Preconditions.isNullOrEmpty(subjectId)) return Promise.reject('subjectId may not be null or empty');
+    if (Preconditions.isNullOrEmpty(bodyId)) return Promise.reject('bodyId may not be null or empty');
+    if (Preconditions.isNullOrEmpty(label)) return Promise.reject('label may not be null or empty');
+    if (Preconditions.isNullOrEmpty(senderAddress)) return Promise.reject('senderAddress may not be null or empty');
+
     // Retrieve promise for recipient
     const recipientRetriever = new RecipientRetriever(this.mysqlConnection);
     const recipientAddressPromise = recipientRetriever.retrieve(label);
@@ -55,8 +64,17 @@ export default class EmailHandler extends Logger {
     const bodyPromise = bodyRetriever.retrieve(bodyId);
 
     // Await all dependencies of the message sender
-    const [recipientAddress, subject, body] =
-      await Promise.all([recipientAddressPromise, subjectPromise, bodyPromise]);
+    let recipientAddress;
+    let subject;
+    let body;
+    try {
+      [recipientAddress, subject, body] =
+        await Promise.all([recipientAddressPromise, subjectPromise, bodyPromise]);
+    } catch (error) {
+      this.log('Error awaiting retrievers!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
 
     // Log them out for troubleshooting
     this.log(`Body: ${body}`);
@@ -64,8 +82,15 @@ export default class EmailHandler extends Logger {
     this.log(`Subject: ${subject}`);
 
     // Send and await the message
-    const messageSender = new MessageSender(this.emailTransporter);
-    const sendResult = await messageSender.send(recipientAddress, senderAddress, subject, body);
+    let sendResult;
+    try {
+      const messageSender = new MessageSender(this.emailTransporter);
+      sendResult = await messageSender.send(recipientAddress, senderAddress, subject, body);
+    } catch (error) {
+      this.log('Error awaiting message send!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
 
     this.log(`Send result: ${sendResult}`);
     return sendResult;

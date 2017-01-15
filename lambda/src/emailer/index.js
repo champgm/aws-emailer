@@ -14,7 +14,7 @@ const nodemailer = require('nodemailer');
 // TODO: Learn how to promisify stuff myself.
 Promise.promisifyAll([Connection]);
 
-/**
+/*
  * Creates a bluebird-promisified MySQL connection with the given parameters
  *
  * @param {any} host - The sever to which a connection will be established
@@ -38,19 +38,22 @@ async function getMysqlConnection(host, port, database, user, password) {
   console.log('Creating MySQL connection...');
   const mysqlConnection = mysql.createConnection(sqlConnectionParameters);
 
-  console.log('Connecting to MySQL...');
-  await mysqlConnection
-    .connectAsync()
-    .then(() => {
-      console.log('Established connection.', mysqlConnection.threadId);
-    })
-    .catch((error) => {
-      console.error('Connection error.', error);
-    });
+  try {
+    console.log('Connecting to MySQL...');
+    await mysqlConnection
+      .connectAsync()
+      .then(() => {
+        console.log('Established connection.', mysqlConnection.threadId);
+      });
+  } catch (error) {
+    this.log('Error connecting to MySQL!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
   return mysqlConnection;
 }
 
-/**
+/*
  * Creates a bluebird-promisified instance of nodemailer which will use
  * GMail as the sending server
  *
@@ -71,12 +74,19 @@ async function getNodeEmailer(senderUsername, senderPassword) {
     debug: true
   };
 
-  // Why doesn't THIS thing need to be in an array when passed to promisifiyAll ?????
-  const emailTransporter = Promise.promisifyAll(nodemailer.createTransport(smtpConfig));
+  let emailTransporter;
+  try {
+    // Why doesn't THIS thing need to be in an array when passed to promisifiyAll ?????
+    emailTransporter = Promise.promisifyAll(nodemailer.createTransport(smtpConfig));
+  } catch (error) {
+    this.log('Error promisifying the email transporter!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
   return emailTransporter;
 }
 
-/**
+/*
  * Main entrypoint to lambda emailer
  *
  * @param {any} event
@@ -115,13 +125,15 @@ module.exports.handler = async function handler(event, context, callback) {
   const senderAddress = `${senderUsername}@gmail.com`;
   // Pass them into the nodemailer creation function
   console.log('Configuring nodemailer...');
-  const emailTransporter = await getNodeEmailer(
+  const emailTransporterPromise = getNodeEmailer(
+    // const emailTransporter = await getNodeEmailer(
     environmentVariables.SENDER_ACCOUNT_USERNAME,
     environmentVariables.SENDER_ACCOUNT_PASSWORD
   );
 
   console.log('Connecting to MySQL...');
-  const mysqlConnection = await getMysqlConnection(
+  const mysqlConnectionPromise = getMysqlConnection(
+    // const mysqlConnection = await getMysqlConnection(
     environmentVariables.RDS_HOSTNAME,
     environmentVariables.RDS_PORT,
     environmentVariables.RDS_DB_NAME,
@@ -129,10 +141,26 @@ module.exports.handler = async function handler(event, context, callback) {
     environmentVariables.RDS_PASSWORD
   );
 
+  let emailTransporter;
+  let mysqlConnection;
+  try {
+    [emailTransporter, mysqlConnection] = Promise.all([emailTransporterPromise, mysqlConnectionPromise]);
+  } catch (error) {
+    this.log('Error awaiting the email transporter and/or MySQL connection!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
+
   // Once you have gathered all of the dependencies, construct and call the EmailHandler
   console.log('Calling Handler...');
-  const emailHandler = new EmailHandler(mysqlConnection, dynamoTable, emailTransporter);
-  await emailHandler.handle(eventId, subjectId, bodyId, label, senderAddress);
+  try {
+    const emailHandler = new EmailHandler(mysqlConnection, dynamoTable, emailTransporter);
+    await emailHandler.handle(eventId, subjectId, bodyId, label, senderAddress);
+  } catch (error) {
+    this.log('Error handling message!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
   console.log('Handled.');
 
   // Don't forget to close the MySQL connection!
@@ -143,4 +171,5 @@ module.exports.handler = async function handler(event, context, callback) {
   console.log('END PROCESSING');
 
   callback(null, 'Email successfully sent?');
+  return new Promise('Eslint wants me to return something');
 };
