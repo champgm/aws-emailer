@@ -38,15 +38,18 @@ async function getMysqlConnection(host, port, database, user, password) {
   console.log('Creating MySQL connection...');
   const mysqlConnection = mysql.createConnection(sqlConnectionParameters);
 
-  console.log('Connecting to MySQL...');
-  await mysqlConnection
-    .connectAsync()
-    .then(() => {
-      console.log('Established connection.', mysqlConnection.threadId);
-    })
-    .catch((error) => {
-      console.error('Connection error.', error);
-    });
+  try {
+    console.log('Connecting to MySQL...');
+    await mysqlConnection
+      .connectAsync()
+      .then(() => {
+        console.log('Established connection.', mysqlConnection.threadId);
+      });
+  } catch (error) {
+    this.log('Error connecting to MySQL!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
   return mysqlConnection;
 }
 
@@ -71,8 +74,15 @@ async function getNodeEmailer(senderUsername, senderPassword) {
     debug: true
   };
 
-  // Why doesn't THIS thing need to be in an array when passed to promisifiyAll ?????
-  const emailTransporter = Promise.promisifyAll(nodemailer.createTransport(smtpConfig));
+  let emailTransporter;
+  try {
+    // Why doesn't THIS thing need to be in an array when passed to promisifiyAll ?????
+    emailTransporter = Promise.promisifyAll(nodemailer.createTransport(smtpConfig));
+  } catch (error) {
+    this.log('Error promisifying the email transporter!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
   return emailTransporter;
 }
 
@@ -115,15 +125,15 @@ module.exports.handler = async function handler(event, context, callback) {
   const senderAddress = `${senderUsername}@gmail.com`;
   // Pass them into the nodemailer creation function
   console.log('Configuring nodemailer...');
-  // const emailTransporterPromise = getNodeEmailer(
-  const emailTransporter = await getNodeEmailer(
+  const emailTransporterPromise = getNodeEmailer(
+    // const emailTransporter = await getNodeEmailer(
     environmentVariables.SENDER_ACCOUNT_USERNAME,
     environmentVariables.SENDER_ACCOUNT_PASSWORD
   );
 
   console.log('Connecting to MySQL...');
-  // const mysqlConnectionPromise = getMysqlConnection(
-  const mysqlConnection = await getMysqlConnection(
+  const mysqlConnectionPromise = getMysqlConnection(
+    // const mysqlConnection = await getMysqlConnection(
     environmentVariables.RDS_HOSTNAME,
     environmentVariables.RDS_PORT,
     environmentVariables.RDS_DB_NAME,
@@ -131,13 +141,15 @@ module.exports.handler = async function handler(event, context, callback) {
     environmentVariables.RDS_PASSWORD
   );
 
-  // let emailTransporter;
-  // let mysqlConnection;
-  // try {
-  //   [emailTransporter, mysqlConnection] = Promise.all([emailTransporterPromise, mysqlConnectionPromise]);
-  // } catch (error) {
-  //   return Promise.reject(error);
-  // }
+  let emailTransporter;
+  let mysqlConnection;
+  try {
+    [emailTransporter, mysqlConnection] = Promise.all([emailTransporterPromise, mysqlConnectionPromise]);
+  } catch (error) {
+    this.log('Error awaiting the email transporter and/or MySQL connection!');
+    this.log(`${JSON.stringify(error)}`);
+    return Promise.reject(error);
+  }
 
   // Once you have gathered all of the dependencies, construct and call the EmailHandler
   console.log('Calling Handler...');

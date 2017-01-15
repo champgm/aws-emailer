@@ -54,10 +54,6 @@ export default class RecipientRetriever extends Logger {
       this.log(`${JSON.stringify(error)}`);
       return Promise.reject(error);
     }
-    // .catch((error) => {
-    //   this.log(`Query FAILED: ${JSON.stringify(error)}`);
-    //   return Promise.reject(error);
-    // });
 
     this.log(`Recipient retrieved: ${address}`);
     return address;

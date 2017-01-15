@@ -54,10 +54,6 @@ export default class SubjectRetriever extends Logger {
       this.log(`${JSON.stringify(error)}`);
       return Promise.reject(error);
     }
-    // .catch((error) => {
-    //   this.log(`Query FAILED: ${JSON.stringify(error)}`);
-    //   return Promise.reject(error);
-    // });
 
     this.log(`Subject retrieved: ${subject}`);
     return subject;

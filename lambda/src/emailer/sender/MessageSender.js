@@ -50,15 +50,18 @@ export default class MessageSender extends Logger {
 
     this.log('Sending email...');
     // Promisified sender...
-    const sendResult = await this.emailTransporter
-      // Send with the promisifed method
-      .sendMailAsync(mailOptions)
-      // Return the result
-      .then(thing => thing)
-      .catch((error) => {
-        this.log(`Sending FAILED: ${JSON.stringify(error)}`);
-        return Promise.reject(error);
-      });
+    let sendResult;
+    try {
+      sendResult = await this.emailTransporter
+        // Send with the promisifed method
+        .sendMailAsync(mailOptions)
+        // Return the result
+        .then(thing => thing);
+    } catch (error) {
+      this.log('Error awaiting message transporter!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
 
     this.log(`Email sent: ${JSON.stringify(sendResult)}`);
     return sendResult;

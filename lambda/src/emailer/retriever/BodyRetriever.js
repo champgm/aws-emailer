@@ -61,10 +61,6 @@ export default class BodyRetriever extends Logger {
       this.log(`${JSON.stringify(error)}`);
       return Promise.reject(error);
     }
-    //   .catch((error) => {
-    //   this.log(`Get result FAILED: ${JSON.stringify(error)}`);
-    //   return Promise.reject(error);
-    // });
 
     this.log(`Body retrieved: ${body}`);
     return body;
