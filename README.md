@@ -41,6 +41,9 @@ Here's what, while logging to the page that loads, submit.php actually does:
    * The key for the subject
    * The key for the body
 
+## Web Frontend Architecture
+![Web Frontend Architecture](/Web-Frontend-Architecture.png?raw=true)
+
 ## Lambda Backend
 Technologies for functionality:
  * ECMAScript6
@@ -63,7 +66,7 @@ Technologies for testing:
 Here's a summary of what the Lambda architecture does:
  * Is triggered by the arrival of an SNS message
  * Attempts to parse keys and recipients from the message
- * Collect environment variables from AWS configuration
+ * Collects environment variables from AWS configuration
  * Retrieves the recipient's address from MySQL
  * Retrieves the intended subject from MySQL
  * Retrieves the intended body from DynamoDB
