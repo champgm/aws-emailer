@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import Logger from '../util/Logger';
 import Preconditions from '../util/Preconditions';
 
@@ -46,15 +47,21 @@ export default class MessageSender extends Logger {
       subject: `${subject}`,
       text: `${body}`
     };
-    this.log(`Mail Options: ${JSON.stringify(mailOptions)}`);
 
     this.log('Sending email...');
     // Promisified sender...
-    const sendResult = await this.emailTransporter
-      // Send with the promisifed method
-      .sendMailAsync(mailOptions)
-      // Return the result
-      .then(thing => thing);
+    let sendResult;
+    try {
+      sendResult = await this.emailTransporter
+        // Send with the promisifed method
+        .sendMailAsync(mailOptions)
+        // Return the result
+        .then(thing => thing);
+    } catch (error) {
+      this.log('Error awaiting message transporter!');
+      this.log(`${JSON.stringify(error)}`);
+      return Promise.reject(error);
+    }
 
     this.log(`Email sent: ${JSON.stringify(sendResult)}`);
     return sendResult;
