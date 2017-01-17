@@ -72,3 +72,6 @@ Here's a summary of what the Lambda architecture does:
  * Retrieves the intended body from DynamoDB
  * Composes all of those items into an email message
  * Sends the message with a preconfigured GMail account
+
+## Lambda Backend Architecture
+![Lambda Backend Architecture](/Lambda-Backend-Architecture.png?raw=true)
