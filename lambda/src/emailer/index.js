@@ -125,15 +125,15 @@ module.exports.handler = async function handler(event, context, callback) {
   const senderAddress = `${senderUsername}@gmail.com`;
   // Pass them into the nodemailer creation function
   console.log('Configuring nodemailer...');
-  const emailTransporterPromise = getNodeEmailer(
-    // const emailTransporter = await getNodeEmailer(
+  // const emailTransporterPromise = getNodeEmailer(
+  const emailTransporter = await getNodeEmailer(
     environmentVariables.SENDER_ACCOUNT_USERNAME,
     environmentVariables.SENDER_ACCOUNT_PASSWORD
   );
 
   console.log('Connecting to MySQL...');
-  const mysqlConnectionPromise = getMysqlConnection(
-    // const mysqlConnection = await getMysqlConnection(
+  // const mysqlConnectionPromise = getMysqlConnection(
+  const mysqlConnection = await getMysqlConnection(
     environmentVariables.RDS_HOSTNAME,
     environmentVariables.RDS_PORT,
     environmentVariables.RDS_DB_NAME,
@@ -141,15 +141,20 @@ module.exports.handler = async function handler(event, context, callback) {
     environmentVariables.RDS_PASSWORD
   );
 
-  let emailTransporter;
-  let mysqlConnection;
-  try {
-    [emailTransporter, mysqlConnection] = Promise.all([emailTransporterPromise, mysqlConnectionPromise]);
-  } catch (error) {
-    this.log('Error awaiting the email transporter and/or MySQL connection!');
-    this.log(`${JSON.stringify(error)}`);
-    return Promise.reject(error);
-  }
+  // This just doesn't work. It would be great if I could wait for both of those promises
+  // at the same time instead of waiting for them serially, but it just doesn't work.
+  // sIt fails silently and I can't figure out how to catch or display the error.
+  // Processing just stops, the timeout runs out on the lambda, and that's it.
+
+  // let emailTransporter;
+  // let mysqlConnection;
+  // try {
+  //   [emailTransporter, mysqlConnection] = Promise.all([emailTransporterPromise, mysqlConnectionPromise]);
+  // } catch (error) {
+  //   this.log('Error awaiting the email transporter and/or MySQL connection!');
+  //   this.log(`${JSON.stringify(error)}`);
+  //   return Promise.reject(error);
+  // }
 
   // Once you have gathered all of the dependencies, construct and call the EmailHandler
   console.log('Calling Handler...');
