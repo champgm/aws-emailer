@@ -2,7 +2,7 @@
   "name": "emailer",
   "version": "1.0.0",
   "description": "The lambda backend for a self-emailer",
-  "main": "index.js",
+  "main": "transpile-nodejs/index.js",
   "scripts": {
     "clean": "rm -rf transpile-nodejs && rm -rf coverage",
     "transpile": "babel ./src -d ./transpile-nodejs",
