@@ -1,15 +1,15 @@
 <?php
+include 'prepareDatabaseConnection.php';
 
+$labelQueryResult = $dbh->query('select label from destinations;');
+$labels = array();
+while ($row = $labelQueryResult->fetch()){
+    array_push($labels, $row['label']);
+};
 
-foreach($labels as $label){
-    print "
-<div class=\"row\">
-    <div class=\"col-xs-4 col-xs-offset-4\">
-        <div class=\"radio\">
-            <label><input type=\"radio\" name=\"label\" value=\"{$label}\">{$label}</label>
-        </div>
-    </div>
-</div>";
-}
+echo json_encode($labels)
 
 ?>
+
+
+
