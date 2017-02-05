@@ -1,0 +1,188 @@
+body {
+	background-color: #f9f6ca;
+	font-family: 'Oxygen', sans-serif;
+}
+
+h1 {
+	margin-top: 5px;
+	margin-left: 0;
+	font-size: 2em;
+	color: #fff;
+	font-weight: bold;
+}
+
+#header-nav {
+	border: 0;
+	border-radius: 0;
+	background-color: #b58900;
+	height: 80px;
+}
+
+form .form-group {
+	margin-top: 70px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+div.form-group > label {
+	padding-top: 10px;
+	padding-bottom: 7px;
+	color: #b58900;
+	font-weight: bold;
+}
+
+div.btn-checkbox {
+	margin-top: 20px;
+	margin-bottom: 30px;
+	margin-top: 10px;
+}
+
+div.btn-checkbox .btn {
+	width: 100px;
+	padding: 10px;
+	background-color: #b58900;
+	margin: 10px 20px 10px 0;
+	box-shadow: 5px 5px 2px #888888;
+}
+
+div.btn-checkbox .btn:hover {
+	color: #fff;
+    background-color: #795548;
+}
+
+div.btn-checkbox .btn.active {
+  background-color: #7c5f20;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+.btn-checkbox span {
+	color: #fff;
+	margin-left: 5px;
+}
+
+#subject-div {
+	position: relative;
+	margin-top: 30px;
+}
+
+#body-div {
+	position: relative;
+	margin-top: 20px;
+}
+
+#text-clear-subject {
+	position: absolute;
+    right: 10px;
+    top: 40px;
+    bottom: 5px;
+    height: 14px;
+    margin: auto;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+#text-clear-body {
+	position: absolute;
+	right: 10px;
+	top: 50px;
+	height: 14px;
+	font-size: 20px;
+	cursor: pointer;
+	color: #ccc;
+}
+
+.form-group input, .form-group textarea {
+	background-color: #e0e0e0;
+}
+
+#main-content #form .text-center button {
+	background-color: #b58900;
+	color: #fff;
+	box-shadow: 5px 5px 2px #888888;
+	margin: 20px 10px 50px 10px;
+	width: 90px;
+}
+
+#main-content #form .text-center .btn-default:hover {
+	color: #fff;
+    background-color: #795548;
+    border-color: #795548; 
+}
+
+/* style the typeahead contact */
+#contact .typeahead {
+		margin-top: 50px;
+		padding-left: 10px;
+		border-radius: 10px;
+		width: 300px;
+		height: 50px;
+		font-size: 2em;
+	}
+
+/* extracted style from https://github.com/twitter/typeahead.js/*/
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu {    /* used to be tt-dropdown-menu in older versions */
+  width: 422px;
+  margin-top: 4px;
+  padding: 4px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  line-height: 24px;
+}
+
+.tt-suggestion.tt-cursor,.tt-suggestion:hover {
+  color: #fff;
+  background-color: #b58900;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+
+/* media queries - devided same way as bootstrap */
+/****************** Large Device Only *******************************/
+@media (min-width: 1200px) {
+
+}
+
+/****************** Medium Device Only *********************************/
+@media (min-width: 992px) and (max-width: 1199px) {
+
+
+	
+}
+
+/****************** Small Device Only *******************************/
+@media (min-width: 768px) and (max-width: 991px) {
+
+}
+
+/**************** Extra Small Devices Only *************************/
+@media (max-width: 767px) {
+
+}
+

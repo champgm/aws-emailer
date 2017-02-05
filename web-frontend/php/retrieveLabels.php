@@ -1,10 +1,13 @@
 <?php
+include 'prepareDatabaseConnection.php';
 
-$labelQueryResult = $dbh->query('select label from destinations;');
+$search = $_POST['search'];
 
-$labels = array();
-while ($row = $labelQueryResult->fetch()){
-    array_push($labels, $row['label']);
-};
+$labelQueryResult = $dbh->prepare("select label from destinations where label like ?");
+$labelQueryResult->execute(array("%$search%"));
+
+$labels = $labelQueryResult->fetchAll();
+
+echo json_encode($labels);
 
 ?>
